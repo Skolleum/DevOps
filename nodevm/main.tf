@@ -1,5 +1,5 @@
-resource "azurerm_resource_group" "Skolleum" {
-  name     = "Skolleum"
+resource "azurerm_resource_group" "skolleum" {
+  name     = "skolleum"
   location = "Germany West Central"
   tags = {
     "purpose" = "test"
@@ -9,27 +9,27 @@ resource "azurerm_resource_group" "Skolleum" {
 resource "azurerm_virtual_network" "node_vnet" {
   name                = "node_vnet"
   address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.Skolleum.location
-  resource_group_name = azurerm_resource_group.Skolleum.name
+  location            = azurerm_resource_group.skolleum.location
+  resource_group_name = azurerm_resource_group.skolleum.name
 }
 
 resource "azurerm_subnet" "node_subnet1" {
   name                 = "node_subnet1"
-  resource_group_name  = azurerm_resource_group.Skolleum.name
+  resource_group_name  = azurerm_resource_group.skolleum.name
   virtual_network_name = azurerm_virtual_network.node_vnet.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
 resource "azurerm_public_ip" "node_public_ip" {
   name                = "node_public_ip"
-  location            = azurerm_resource_group.Skolleum.location
-  resource_group_name = azurerm_resource_group.Skolleum.name
+  location            = azurerm_resource_group.skolleum.location
+  resource_group_name = azurerm_resource_group.skolleum.name
   allocation_method   = "Dynamic"
 }
 
 resource "azurerm_network_security_rule" "node_sec_rule" {
     network_security_group_name = azurerm_network_security_group.node_network_sec_group.name
-    resource_group_name = azurerm_resource_group.Skolleum.name
+    resource_group_name = azurerm_resource_group.skolleum.name
     access                     = "Allow"
     description                = "Allow ssh access"
     destination_address_prefix = "*"
@@ -44,14 +44,14 @@ resource "azurerm_network_security_rule" "node_sec_rule" {
 
 resource "azurerm_network_security_group" "node_network_sec_group" {
   name                = "node_network_sec_group"
-  location            = azurerm_resource_group.Skolleum.location
-  resource_group_name = azurerm_resource_group.Skolleum.name
+  location            = azurerm_resource_group.skolleum.location
+  resource_group_name = azurerm_resource_group.skolleum.name
 }
 
 resource "azurerm_network_interface" "node_nic" {
   name                = "node_nic"
-  location            = azurerm_resource_group.Skolleum.location
-  resource_group_name = azurerm_resource_group.Skolleum.name
+  location            = azurerm_resource_group.skolleum.location
+  resource_group_name = azurerm_resource_group.skolleum.name
   ip_configuration {
     name                          = "node_nic_config"
     subnet_id                     = azurerm_subnet.node_subnet1.id
@@ -67,15 +67,15 @@ resource "azurerm_network_interface_security_group_association" "node_nsg_assoc"
 
 resource "random_id" "node_storage_id" {
   keepers = {
-    resource_group = azurerm_resource_group.Skolleum.name
+    resource_group = azurerm_resource_group.skolleum.name
   }
   byte_length = 8
 }
 
 resource "azurerm_storage_account" "node_storage_account" {
   name                     = "diag${random_id.node_storage_id.hex}"
-  location                 = azurerm_resource_group.Skolleum.location
-  resource_group_name      = azurerm_resource_group.Skolleum.name
+  location                 = azurerm_resource_group.skolleum.location
+  resource_group_name      = azurerm_resource_group.skolleum.name
   account_kind             = "StorageV2"
   account_replication_type = "LRS"
   account_tier             = "Standard"
@@ -94,8 +94,8 @@ resource "tls_private_key" "node-seckey" {
 
 resource "azurerm_linux_virtual_machine" "node_vm" {
   name                  = "node_vm"
-  location              = azurerm_resource_group.Skolleum.location
-  resource_group_name   = azurerm_resource_group.Skolleum.name
+  location              = azurerm_resource_group.skolleum.location
+  resource_group_name   = azurerm_resource_group.skolleum.name
   network_interface_ids = [azurerm_network_interface.node_nic.id]
   size                  = "Standard_B2s"
   os_disk {
