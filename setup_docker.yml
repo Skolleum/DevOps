@@ -1,0 +1,26 @@
+---
+- hosts: all
+  gather_facts: false
+  become: true
+  vars:
+    - ansible_ssh_private_key_file: "nodevm/node_vm.pem"
+    - ansible_user: "azuser"
+
+  tasks:
+    - name: Install yum-utils
+      ansible.builtin.dnf:
+        name: yum-utils
+        state: present
+
+    - name: Add docker-ce repo
+      ansible.builtin.command:
+        cmd: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        creates: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install docker rpms
+      ansible.builtin.dnf:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present

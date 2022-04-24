@@ -126,5 +126,8 @@ resource "azurerm_linux_virtual_machine" "node_vm" {
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.node_storage_account.primary_blob_endpoint
   }
+  tags = {
+    "applicationRole" = "main_vm"
+  }
 }
 

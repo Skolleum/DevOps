@@ -1,0 +1,12 @@
+# Azure inventory file
+plugin: azure.azcollection.azure_rm
+
+# Use cli auth session
+auth_source: cli
+
+# Use skolleum RG
+include_vm_resource_groups:
+  - skolleum
+
+keyed_groups:
+  - key: tags.applicationRole
