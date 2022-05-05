@@ -1,4 +1,4 @@
-# Azure inventory file
+## Azure inventory file ##
 plugin: azure.azcollection.azure_rm
 
 # Use cli auth session
