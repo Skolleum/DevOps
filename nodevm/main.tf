@@ -131,3 +131,17 @@ resource "azurerm_linux_virtual_machine" "node_vm" {
   }
 }
 
+resource "azurerm_iothub" "iot_broker" {
+  name                = "iot-broker"
+  resource_group_name = azurerm_resource_group.skolleum.name
+  location            = azurerm_resource_group.skolleum.location
+
+  event_hub_retention_in_days = 1
+  public_network_access_enabled = true
+  event_hub_partition_count = 2
+  sku {
+    name     = "F1"
+    capacity = 1
+  }
+}
+
