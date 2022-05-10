@@ -16,7 +16,7 @@ jobs:
     steps:
       - run:
           name: "Clone gundb"
-          command: "git clone 'git@github.com:amark/gun.git'"
+          command: "git clone 'https://github.com/amark/gun.git'"
       - run:
           name: "Build gundb container"
           command: "docker build -t skolleum/gundb:v1 ."
