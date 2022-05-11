@@ -10,3 +10,4 @@ Future plans:
 - [ ] Store gundb container, probably on github packages.
 - [ ] Store Skolleum containers (db, backend etc) on github packages (?).
 - [ ] Integrate the deploy process to the pipelines.
+- [ ] Add format checking to the pipeline.
