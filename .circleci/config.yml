@@ -10,7 +10,7 @@ jobs:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
-      - image: cimg/base:stable          
+      - image: cimg/base:stable
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
@@ -22,14 +22,14 @@ jobs:
           command: "git clone 'https://github.com/amark/gun.git'"
       - run:
           name: "Build gundb container"
-          command: "docker build -t skolleum/gundb:${CIRCLE_BUILD_NUM} ."
+          command: "docker build -t ghcr.io/skolleum/gundb:$CIRCLE_BUILD_NUM ."
           working_directory: ~/build/gun
       - run:
           name: "Login to github container registery"
           command: "echo $GITHUB_TOKEN | docker login ghcr.io -u AkkokUgurcan --password-stdin"
       - run:
           name: "Push gundb image"
-          command: "docker push ghcr.io/Skolleum/gundb :$CIRCLE_BUILD_NUM"
+          command: "docker push ghcr.io/skolleum/gundb:$CIRCLE_BUILD_NUM"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
