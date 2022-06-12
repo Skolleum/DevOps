@@ -96,3 +96,6 @@ workflows:
           requires:
             - gundb_container
             - eth_container
+      - start_services:
+          requires:
+            - provision
