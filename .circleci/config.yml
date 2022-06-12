@@ -38,7 +38,7 @@ jobs:
       - run:
           name: "Build smart contracts container"
           command: "docker build -t ghcr.io/skolleum/eth:$CIRCLE_BUILD_NUM ."
-          working_directory: ~/build/eth
+          working_directory: ~/build/SmartContract
       - run:
           name: "Login to github container registery"
           command: "echo $GITHUB_TOKEN | docker login ghcr.io -u AkkokUgurcan --password-stdin"
