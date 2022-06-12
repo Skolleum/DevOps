@@ -72,9 +72,9 @@ jobs:
       - terraform/apply:
           path: ./nodevm
       - save_cache:
-        key: tf_state
-        paths:
-          - terraform.tfstate
+          key: tf_state
+          paths:
+            - terraform.tfstate
 
 workflows:
   deploy:
