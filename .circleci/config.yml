@@ -56,8 +56,8 @@ jobs:
           command: "docker push ghcr.io/skolleum/eth:latest"
   provision:
     executor: 
-      terraform/default:
-        tag: 1.1
+      name: terraform/default
+      tag: "1.1"
     steps:
       - checkout
       - terraform/init:
