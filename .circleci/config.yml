@@ -23,6 +23,9 @@ jobs:
       - run:
           name: "Push gundb image"
           command: "docker push ghcr.io/skolleum/gundb:$CIRCLE_BUILD_NUM"
+      - run:
+          name: "Push gundb image as latest"
+          command: "docker push ghcr.io/skolleum/gundb:latest"
   eth_container:
     working_directory: ~/build
     docker:
@@ -45,6 +48,9 @@ jobs:
       - run:
           name: "Push smart contract (eth) image"
           command: "docker push ghcr.io/skolleum/eth:$CIRCLE_BUILD_NUM"
+      - run:
+          name: "Push smart contract (eth) image as latest"
+          command: "docker push ghcr.io/skolleum/eth:latest"
 
 workflows:
   dependencies:
