@@ -57,7 +57,7 @@ jobs:
   provision:
     executor: 
       name: terraform/default
-      tag: "1.1"
+      tag: "1.2.2"
     steps:
       - checkout
       - terraform/init:
