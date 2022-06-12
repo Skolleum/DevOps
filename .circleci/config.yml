@@ -70,13 +70,11 @@ jobs:
           path: ./nodevm
 
 workflows:
-  dependencies:
+  deploy:
     jobs:
       - gundb_container
       - eth_container
-  deploy:
-    jobs:
       - provision:
-        requires:
-          - dependencies
-
+          requires:
+            - gundb_container
+            - eth_container
