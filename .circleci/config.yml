@@ -68,8 +68,6 @@ jobs:
           path: ./nodevm
       - terraform/apply:
           path: ./nodevm
-      - terraform/destroy:
-          path: ./nodevm
   start_services:
     docker:
       - image: cimg/python:3.8
