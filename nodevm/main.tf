@@ -131,8 +131,8 @@ resource "azurerm_linux_virtual_machine" "node_vm" {
   }
 }
 
-resource "azurerm_iothub" "iot_broker" {
-  name                = "iot-broker"
+resource "azurerm_iothub" "iot_broker_iothub" {
+  name                = "iot-broker-iothub"
   resource_group_name = azurerm_resource_group.skolleum.name
   location            = azurerm_resource_group.skolleum.location
 
