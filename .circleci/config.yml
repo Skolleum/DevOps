@@ -68,6 +68,24 @@ jobs:
           path: ./nodevm
       - terraform/apply:
           path: ./nodevm
+      - terraform/destroy:
+          path: ./nodevm
+  start_services:
+    docker:
+      - image: cimg/python:3.8
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: "Install ansible"
+          command: |
+            apt update
+            apt install software-properties-common
+            add-apt-repository --yes --update ppa:ansible/ansible
+            apt install ansible
+      - run:
+          name: "Run main.yml, start services"
+          command: ansible-playbook -i azure_rm.yml main.yml
 
 workflows:
   deploy:

@@ -1,0 +1,62 @@
+---
+- hosts: all
+  gather_facts: false
+  become: true
+  vars:
+    - ansible_ssh_private_key_file: "~/.ssh/id_rsa4096_azure"
+    - ansible_user: "azuser"
+
+  tasks:
+    - name: Install yum-utils
+      ansible.builtin.dnf:
+        name: yum-utils
+        state: present
+
+    - name: Add docker-ce repo
+      ansible.builtin.command:
+        cmd: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        creates: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install docker rpms
+      ansible.builtin.dnf:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+    - name: Install necessary python modules
+      pip:
+        name:
+          - docker
+          - docker-compose
+    - name: Start docker service
+      ansible.builtin.systemd:
+        state: started
+        name: docker
+    - name: Login to ghcr.io
+      community.docker.docker_login:
+        registry_url: ghcr.io
+        username: AkkokUgurcan
+        password: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+    - name: Start services with docker compose
+      community.docker.docker_compose:
+        state: present
+        pull: yes
+        project_name: skolleum
+        definition:
+          services:
+            database:
+              image: ghcr.io/skolleum/gundb
+              ports:
+                - 8080:8080
+                - 8765:8765
+            eth:
+              image: ghcr.io/skolleum/eth
+              network_mode: host
+              depends_on:
+                - evm
+            evm:
+              image: ethereum/client-go
+              network_mode: host
+              command: --dev --http --http.port 7545 --http.api eth,web3,personal,net --http.corsdomain http://remix.ethereum.org
