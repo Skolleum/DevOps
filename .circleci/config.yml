@@ -62,12 +62,19 @@ jobs:
       - checkout
       - terraform/init:
           path: ./nodevm
-      - terraform/validate:
+      - restore_cache:
+        keys:
+          - tf_state
+      - terraform/destroy:
           path: ./nodevm
-      - terraform/plan:
+      - terraform/validate:
           path: ./nodevm
       - terraform/apply:
           path: ./nodevm
+      - save_cache:
+        key: tf_state
+        paths:
+          - terraform.tfstate
 
 workflows:
   deploy:
