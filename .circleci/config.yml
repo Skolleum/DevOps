@@ -55,9 +55,7 @@ jobs:
           name: "Push smart contract (eth) image as latest"
           command: "docker push ghcr.io/skolleum/eth:latest"
   provision:
-    docker:
-      - image: cimg/base:current
-    resource_class: medium
+    executor: terraform/default
     steps:
       - checkout
       - terraform/init:
