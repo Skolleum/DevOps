@@ -76,5 +76,7 @@ workflows:
       - eth_container
   deploy:
     jobs:
-      - provision
+      - provision:
+        requires:
+          - dependencies
 
