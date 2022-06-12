@@ -1,11 +1,19 @@
 services:
   database:
-    image: gundb/gun
+    image: ghcr.io/skolleum/gundb
     ports:
       - 8080:8080
       - 8765:8765
-  backend:
-    image: node:current-alpine
-    command: --version
-
+  # backend:
+  #   image: node:current-alpine
+  #   command: --version
+  eth:
+    image: ghcr.io/skolleum/eth
+    network_mode: host
+    depends_on:
+      - evm
+  evm:
+    image: ethereum/client-go
+    network_mode: host
+    command: --dev --http --http.port 7545 --http.api eth,web3,personal,net --http.corsdomain http://remix.ethereum.org
 
