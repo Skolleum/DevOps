@@ -64,6 +64,8 @@ jobs:
           path: ./nodevm
       - terraform/validate:
           path: ./nodevm
+      - terraform/destroy:
+          path: ./nodevm
       - terraform/plan:
           path: ./nodevm
       - terraform/apply:
