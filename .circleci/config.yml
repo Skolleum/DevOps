@@ -15,7 +15,7 @@ jobs:
           command: "git clone 'https://github.com/amark/gun.git'"
       - run:
           name: "Build gundb container"
-          command: "docker build -t ghcr.io/skolleum/gundb:$CIRCLE_BUILD_NUM ."
+          command: "docker build -t ghcr.io/skolleum/gundb:$CIRCLE_BUILD_NUM -t ghcr.io/skolleum/gundb:latest."
           working_directory: ~/build/gun
       - run:
           name: "Login to github container registery"
@@ -40,7 +40,7 @@ jobs:
           command: "git clone -b cicd 'https://github.com/Skolleum/SmartContract.git'"
       - run:
           name: "Build smart contracts container"
-          command: "docker build -t ghcr.io/skolleum/eth:$CIRCLE_BUILD_NUM ."
+          command: "docker build -t ghcr.io/skolleum/eth:$CIRCLE_BUILD_NUM -t ghcr.io/skolleum/eth:latest ."
           working_directory: ~/build/SmartContract
       - run:
           name: "Login to github container registery"
