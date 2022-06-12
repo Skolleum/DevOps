@@ -63,8 +63,8 @@ jobs:
       - terraform/init:
           path: ./nodevm
       - restore_cache:
-        keys:
-          - tf_state
+          keys:
+            - tf_state
       - terraform/destroy:
           path: ./nodevm
       - terraform/validate:
