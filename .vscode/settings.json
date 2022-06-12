@@ -1,0 +1,9 @@
+{
+    "yaml.schemas": {
+        "https://raw.githubusercontent.com/ansible-community/schemas/main/f/ansible.json#/$defs/playbook": [
+            "file:///home/ucak/dev/skolleum/devops/main.yml",
+            "file:///home/ucak/dev/skolleum/devops/setup_docker.yml"
+        ],
+        "https://json.schemastore.org/circleciconfig.json": "file:///home/ucak/dev/skolleum/devops/.circleci/config.yml"
+    }
+}
