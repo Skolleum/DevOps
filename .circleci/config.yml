@@ -1,10 +1,13 @@
 version: 2.1
+orbs:
+  terraform: circleci/terraform@3.1.0
+  azure-cli: circleci/azure-cli@1.2.2
 
 jobs:
   gundb_container:
     working_directory: ~/build
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:current
     resource_class: medium
     steps:
       - setup_remote_docker:
@@ -29,7 +32,7 @@ jobs:
   eth_container:
     working_directory: ~/build
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:current
     resource_class: medium
     steps:
       - setup_remote_docker:
@@ -51,9 +54,27 @@ jobs:
       - run:
           name: "Push smart contract (eth) image as latest"
           command: "docker push ghcr.io/skolleum/eth:latest"
+  provision:
+    docker:
+      - image: cimg/base:current
+    resource_class: medium
+    steps:
+      - checkout
+      - terraform/init:
+          path: ./nodevm
+      - terraform/validate:
+          path: ./nodevm
+      - terraform/plan:
+          path: ./nodevm
+      - terraform/apply:
+          path: ./nodevm
 
 workflows:
   dependencies:
     jobs:
       - gundb_container
       - eth_container
+  deploy:
+    jobs:
+      - provision:
+
