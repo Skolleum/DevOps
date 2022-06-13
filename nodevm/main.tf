@@ -81,17 +81,6 @@ resource "azurerm_storage_account" "node_storage_account" {
   account_tier             = "Standard"
 }
 
-resource "local_sensitive_file" "ssh_priv_key" {
-  content = tls_private_key.node-seckey.private_key_pem
-  filename = "${azurerm_linux_virtual_machine.node_vm.name}.pem"
-  file_permission = "600"
-}
-
-resource "tls_private_key" "node-seckey" {
-  algorithm = "RSA"
-  rsa_bits = 4096
-}
-
 resource "azurerm_linux_virtual_machine" "node_vm" {
   name                  = "node_vm"
   location              = azurerm_resource_group.skolleum.location
@@ -121,18 +110,15 @@ resource "azurerm_linux_virtual_machine" "node_vm" {
   disable_password_authentication = true
   admin_ssh_key {
     username   = "azuser"
-    public_key = tls_private_key.node-seckey.public_key_openssh
+    public_key = file("./azvm_key.pub")
   }
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.node_storage_account.primary_blob_endpoint
   }
-  tags = {
-    "applicationRole" = "main_vm"
-  }
 }
 
-resource "azurerm_iothub" "iot_broker" {
-  name                = "iot-broker"
+resource "azurerm_iothub" "iot_broker_iothub" {
+  name                = "iot-broker-iothub"
   resource_group_name = azurerm_resource_group.skolleum.name
   location            = azurerm_resource_group.skolleum.location
 

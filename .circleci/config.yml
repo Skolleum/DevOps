@@ -1,19 +1,13 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
+orbs:
+  azure-cli: circleci/azure-cli@1.2.2
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
   gundb_container:
     working_directory: ~/build
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:current
     resource_class: medium
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - setup_remote_docker:
           docker_layer_caching: true
@@ -23,7 +17,7 @@ jobs:
           command: "git clone 'https://github.com/amark/gun.git'"
       - run:
           name: "Build gundb container"
-          command: "docker build -t ghcr.io/skolleum/gundb:$CIRCLE_BUILD_NUM ."
+          command: "docker build -t ghcr.io/skolleum/gundb:$CIRCLE_BUILD_NUM -t ghcr.io/skolleum/gundb:latest ."
           working_directory: ~/build/gun
       - run:
           name: "Login to github container registery"
@@ -31,10 +25,108 @@ jobs:
       - run:
           name: "Push gundb image"
           command: "docker push ghcr.io/skolleum/gundb:$CIRCLE_BUILD_NUM"
+      - run:
+          name: "Push gundb image as latest"
+          command: "docker push ghcr.io/skolleum/gundb:latest"
+  eth_container:
+    working_directory: ~/build
+    docker:
+      - image: cimg/base:current
+    resource_class: large
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 20.10.7
+      - run:
+          name: "Clone SmartContracts"
+          command: "git clone -b cicd 'https://github.com/Skolleum/SmartContract.git'"
+      - run:
+          name: "Build smart contracts container"
+          command: "docker build -t ghcr.io/skolleum/eth:$CIRCLE_BUILD_NUM -t ghcr.io/skolleum/eth:latest ."
+          working_directory: ~/build/SmartContract
+      - run:
+          name: "Login to github container registery"
+          command: "echo $GITHUB_TOKEN | docker login ghcr.io -u AkkokUgurcan --password-stdin"
+      - run:
+          name: "Push smart contract (eth) image"
+          command: "docker push ghcr.io/skolleum/eth:$CIRCLE_BUILD_NUM"
+      - run:
+          name: "Push smart contract (eth) image as latest"
+          command: "docker push ghcr.io/skolleum/eth:latest"
+  provision:
+    docker: 
+      - image: hashicorp/terraform:light
+    steps:
+      - checkout
+      - run:
+          name: "Terraform init"
+          command: terraform init -input=false
+          working_directory: ./nodevm
+      - run:
+          name: "Terraform validate"
+          command: terraform validate
+          working_directory: ./nodevm
+      - run:
+          name: "Terraform apply"
+          command: terraform apply -auto-approve
+          working_directory: ./nodevm
+      - persist_to_workspace:
+          root: ./nodevm
+          paths:
+            - terraform.tfstate*
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+  start_services:
+    docker:
+      - image: cimg/python:3.8
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: "Install ansible"
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible
+      - run:
+          name: "Add azurerm collection"
+          command: ansible-galaxy collection install azure.azcollection
+      - run:
+          name: "Run main.yml, start services"
+          command: | 
+            export AZURE_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}
+            export AZURE_CLIENT_ID=${ARM_CLIENT_ID}
+            export AZURE_SECRET=${ARM_CLIENT_SECRET}
+            export AZURE_TENANT=${ARM_TENANT_ID}
+            ansible-playbook -i azure_rm.yml main.yml
+  clean:
+    docker: 
+      - image: hashicorp/terraform:light
+    steps:
+      - checkout
+      - run:
+          name: "Terraform destroy"
+          working_directory: ./nodevm
+          command: |
+            terraform init -input=false
+            terraform destroy -auto-approve
+
 workflows:
-  dependencies:
+  deploy:
     jobs:
       - gundb_container
+      - eth_container
+      - provision:
+          requires:
+            - gundb_container
+            - eth_container
+      - start_services:
+          requires:
+            - provision
+      - clean:
+          requires:
+            - start_services
+          filters:
+            branches:
+              only: 
+                - dev
