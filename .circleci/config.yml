@@ -1,6 +1,5 @@
 version: 2.1
 orbs:
-  terraform: circleci/terraform@3.1.0
   azure-cli: circleci/azure-cli@1.2.2
 
 jobs:
@@ -55,20 +54,27 @@ jobs:
           name: "Push smart contract (eth) image as latest"
           command: "docker push ghcr.io/skolleum/eth:latest"
   provision:
-    executor: 
-      name: terraform/default
-      tag: "1.2.2"
+    docker: 
+      - image: hashicorp/terraform:light
     steps:
       - checkout
-      - terraform/init:
-          path: ./nodevm
-      - terraform/validate:
-          path: ./nodevm
-      - terraform/plan:
-          path: ./nodevm
-      - terraform/apply:
-          path: ./nodevm
-          persist-workspace: true
+      - run:
+          name: "Terraform init"
+          command: terraform init -input=false
+          working_directory: ./nodevm
+      - run:
+          name: "Terraform validate"
+          command: terraform validate
+          working_directory: ./nodevm
+      - run:
+          name: "Terraform apply"
+          command: terraform apply -auto-approve
+          working_directory: ./nodevm
+      - persist_to_workspace:
+          root: ./nodevm
+          paths:
+            - terraform.tfstate*
+
   start_services:
     docker:
       - image: cimg/python:3.8
@@ -94,16 +100,14 @@ jobs:
             AZURE_SECRET:           ${ARM_CLIENT_SECRET}
             AZURE_TENANT:           ${ARM_TENANT_ID}
   clean:
-    executor: 
-      name: terraform/default
-      tag: "1.2.2"
+    docker: 
+      - image: hashicorp/terraform:light
     steps:
       - checkout
-      - terraform/init:
-          path: ./nodevm
-      - terraform/destroy:
-          attach-workspace: true
-          path: ./nodevm
+      - run:
+          name: "Terraform destroy"
+          working_directory: ./nodevm
+          command: terraform destroy -auto-approve
 
 workflows:
   deploy:
