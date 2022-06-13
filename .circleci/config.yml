@@ -87,6 +87,11 @@ jobs:
       - run:
           name: "Run main.yml, start services"
           command: ansible-playbook -i azure_rm.yml main.yml
+          environment:
+            AZURE_SUBSCRIPTION_ID:  ${ARM_SUBSCRIPTION_ID}
+            AZURE_CLIENT_ID:        ${ARM_CLIENT_ID}
+            AZURE_SECRET:           ${ARM_CLIENT_SECRET}
+            AZURE_TENANT:           ${ARM_TENANT_ID}
   clean:
     executor: 
       name: terraform/default
