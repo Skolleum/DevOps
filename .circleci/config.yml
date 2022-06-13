@@ -68,6 +68,7 @@ jobs:
           path: ./nodevm
       - terraform/apply:
           path: ./nodevm
+          persist-workspace: true
   start_services:
     docker:
       - image: cimg/python:3.8
@@ -101,6 +102,7 @@ jobs:
       - terraform/init:
           path: ./nodevm
       - terraform/destroy:
+          attach-workspace: true
           path: ./nodevm
 
 workflows:
