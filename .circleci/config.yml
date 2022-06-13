@@ -82,6 +82,9 @@ jobs:
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible
       - run:
+          name: "Add azurerm collection"
+          command: ansible-galaxy collection install azure.azcollection
+      - run:
           name: "Run main.yml, start services"
           command: ansible-playbook -i azure_rm.yml main.yml
 
