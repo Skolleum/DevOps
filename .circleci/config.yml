@@ -87,6 +87,16 @@ jobs:
       - run:
           name: "Run main.yml, start services"
           command: ansible-playbook -i azure_rm.yml main.yml
+  clean:
+    executor: 
+      name: terraform/default
+      tag: "1.2.2"
+    steps:
+      - checkout
+      - terraform/init:
+          path: ./nodevm
+      - terraform/destroy:
+          path: ./nodevm
 
 workflows:
   deploy:
@@ -100,3 +110,10 @@ workflows:
       - start_services:
           requires:
             - provision
+      - clean:
+          requires:
+            - start_services
+          filters:
+            branches:
+              only: 
+                - dev
