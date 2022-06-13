@@ -107,7 +107,9 @@ jobs:
       - run:
           name: "Terraform destroy"
           working_directory: ./nodevm
-          command: terraform destroy -auto-approve
+          command: |
+            terraform init -input=false
+            terraform destroy -auto-approve
 
 workflows:
   deploy:
