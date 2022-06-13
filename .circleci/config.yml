@@ -93,12 +93,12 @@ jobs:
           command: ansible-galaxy collection install azure.azcollection
       - run:
           name: "Run main.yml, start services"
-          command: ansible-playbook -i azure_rm.yml main.yml
-          environment:
-            AZURE_SUBSCRIPTION_ID:  ${ARM_SUBSCRIPTION_ID}
-            AZURE_CLIENT_ID:        ${ARM_CLIENT_ID}
-            AZURE_SECRET:           ${ARM_CLIENT_SECRET}
-            AZURE_TENANT:           ${ARM_TENANT_ID}
+          command: | 
+            export AZURE_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}
+            export AZURE_CLIENT_ID=${ARM_CLIENT_ID}
+            export AZURE_SECRET=${ARM_CLIENT_SECRET}
+            export AZURE_TENANT=${ARM_TENANT_ID}
+            ansible-playbook -i azure_rm.yml main.yml
   clean:
     docker: 
       - image: hashicorp/terraform:light
